@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Trends</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, #4f46e5, #4338ca);
+            color: white;
+            position: fixed;
+            height: 100%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 10;
+        }
+        
+        .sidebar h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar ul li a {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .sidebar ul li a.logout {
+            color: #fca5a5;
+            margin-top: 40px;
+        }
+        
+        .sidebar ul li a.logout:hover {
+            color: #ef4444;
+        }
+        
+        .main-content {
+            margin-left: 290px;
+            padding: 30px;
+            flex-grow: 1;
+        }
+        
+        .main-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+        }
+        
+        .main-content h1 i {
+            margin-right: 10px;
+            color: #4f46e5;
+        }
+        
+        .trends-container {
+            margin-top: 20px;
+        }
+        
+        .trends-header {
+            background-color: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .trends-header p {
+            margin: 0;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-top: 4px solid #4f46e5;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .course-title i {
+            margin-right: 8px;
+            color: #4f46e5;
+        }
+        
+        .course-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .course-link:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .course-link i {
+            margin-right: 6px;
+        }
+        
+        .no-courses {
+            background-color: #f1f5f9;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .no-courses-icon {
+            font-size: 50px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+        
+        .no-courses-text {
+            color: #475569;
+            font-size: 18px;
+        }
+        
+        .skill-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .skill-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .skill-title i {
+            margin-right: 8px;
+            color: #4f46e5;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .skill-tag {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #f1f5f9;
+            color: #475569;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-tag:hover {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .skill-tag i {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 15px 10px;
+            }
+            
+            .sidebar h2 {
+                font-size: 0;
+                text-align: center;
+            }
+            
+            .sidebar h2::before {
+                content: "\f0c9";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 24px;
+            }
+            
+            .sidebar ul li a {
+                padding: 15px 0;
+                text-align: center;
+            }
+            
+            .sidebar ul li a span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 100px;
+            }
+            
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {% if category == 'danger' %}<i class="fas fa-exclamation-circle"></i>{% else %}<i class="fas fa-check-circle"></i>{% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <div class="sidebar">
+        <h2><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</h2>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-briefcase mr-2"></i> <span>Job Recommendations</span></a></li>
+            <li><a href="{{ url_for('market_trends') }}" class="active"><i class="fas fa-chart-line mr-2"></i> <span>Market Trends</span></a></li>
+            <li><a href="{{ url_for('saved_jobs') }}"><i class="fas fa-bookmark mr-2"></i> <span>Saved Jobs</span></a></li>
+            <li><a href="{{ url_for('logout') }}" class="logout"><i class="fas fa-sign-out-alt mr-2"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1><i class="fas fa-chart-line"></i> Market Trends</h1>
+
+        <div class="trends-container">
+            <div class="trends-header">
+                <p>Stay updated with the latest industry trends and enhance your skills with these recommended courses. These courses align with current market demands and can help boost your career prospects.</p>
+            </div>
+
+            <div class="skill-section">
+                <div class="skill-title">
+                    <i class="fas fa-fire"></i> In-Demand Skills
+                </div>
+                <p>These skills are trending in the job market right now:</p>
+                <div class="skill-tags">
+                    <div class="skill-tag"><i class="fas fa-check"></i> Machine Learning</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> Data Analysis</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> Cloud Computing</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> Full Stack Development</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> UI/UX Design</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> DevOps</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> Cybersecurity</div>
+                    <div class="skill-tag"><i class="fas fa-check"></i> Artificial Intelligence</div>
+                </div>
+            </div>
+
+            <h2><i class="fas fa-graduation-cap mr-2"></i> Recommended Courses</h2>
+            
+            {% if courses %}
+                <div class="course-grid">
+                    {% for course in courses %}
+                        <div class="course-card">
+                            <div class="course-title">
+                                <i class="fas fa-book"></i> {{ course[1] }}
+                            </div>
+                            <a href="{{ course[2] }}" target="_blank" class="course-link">
+                                <i class="fas fa-external-link-alt"></i> View Course
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-courses">
+                    <div class="no-courses-icon">
+                        <i class="far fa-folder-open"></i>
+                    </div>
+                    <div class="no-courses-text">No courses available at the moment.</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

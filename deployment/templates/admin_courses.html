@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Courses</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        .course-form {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+        
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        
+        .hint-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .submit-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .submit-btn:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submit-btn i {
+            margin-right: 8px;
+        }
+        
+        .course-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-table th,
+        .course-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .course-table th {
+            background-color: #f8fafc;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        
+        .course-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .course-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .course-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            color: white;
+            background-color: #0ea5e9;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+        }
+        
+        .view-btn i {
+            margin-right: 5px;
+        }
+        
+        .edit-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            color: white;
+            background-color: #f59e0b;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+        
+        .edit-btn i {
+            margin-right: 5px;
+        }
+        
+        .delete-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            color: white;
+            background-color: #ef4444;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        .delete-btn i {
+            margin-right: 5px;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash {
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            animation: slideInUp 0.3s ease;
+        }
+        
+        .flash i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .flash-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .flash-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .flash-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #f8fafc;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .empty-icon {
+            font-size: 60px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            color: #4b5563;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .course-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .course-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2><i class="fas fa-user-shield mr-2"></i>Admin Panel</h2>
+        <ul>
+            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</a></li>
+            <li><a href="{{ url_for('admin_courses') }}" class="active"><i class="fas fa-graduation-cap mr-2"></i>Manage Courses</a></li>
+            <li><a href="{{ url_for('admin_market_trends') }}"><i class="fas fa-chart-line mr-2"></i>Market Trends</a></li>
+            <li><a href="{{ url_for('admin_logout') }}" class="logout"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1><i class="fas fa-graduation-cap mr-2"></i>Manage Courses</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Add Course Form -->
+        <div class="course-form">
+            <div class="form-title">
+                <i class="fas fa-plus-circle mr-2"></i> Add New Course
+            </div>
+            
+            <form method="POST" class="course-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="course_name"><i class="fas fa-book mr-2"></i>Course Name:</label>
+                        <input type="text" id="course_name" name="course_name" required>
+                        <div class="hint-text">Enter a descriptive name for the course</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course_link"><i class="fas fa-link mr-2"></i>Course Link:</label>
+                        <input type="url" id="course_link" name="course_link" required>
+                        <div class="hint-text">Enter the full URL including https://</div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-plus"></i> Add Course
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Available Courses -->
+        <h2><i class="fas fa-list-alt mr-2"></i>Available Courses</h2>
+        
+        {% if courses %}
+            <table class="course-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Course Name</th>
+                        <th>Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ course[1] }}</td>
+                            <td>{{ course[2] }}</td>
+                            <td>
+                                <div class="course-actions">
+                                    <a href="{{ course[2] }}" target="_blank" class="view-btn">
+                                        <i class="fas fa-external-link-alt"></i> View
+                                    </a>
+                                    <a href="#" class="edit-btn">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="#" class="delete-btn">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="empty-text">No courses available yet. Add your first course above!</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss flash messages
+            const flashMessages = document.querySelectorAll('.flash');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            });
+            
+            // Form validation
+            const form = document.querySelector('.course-form form');
+            form.addEventListener('submit', function(e) {
+                const courseName = document.getElementById('course_name');
+                const courseLink = document.getElementById('course_link');
+                let isValid = true;
+                
+                if (!courseName.value.trim()) {
+                    courseName.style.borderColor = '#ef4444';
+                    isValid = false;
+                } else {
+                    courseName.style.borderColor = '#d1d5db';
+                }
+                
+                if (!courseLink.value.trim() || !courseLink.value.startsWith('http')) {
+                    courseLink.style.borderColor = '#ef4444';
+                    isValid = false;
+                } else {
+                    courseLink.style.borderColor = '#d1d5db';
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    form.classList.add('shake');
+                    setTimeout(() => {
+                        form.classList.remove('shake');
+                    }, 500);
+                }
+            });
+            
+            // Confirm delete
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to delete this course?')) {
+                        // Submit delete form or perform delete action
+                        window.location.href = this.href;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

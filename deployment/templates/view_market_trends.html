@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Courses</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('admin_market_trends') }}">Manage Courses</a></li>
+            <li><a href="{{ url_for('admin_logout') }}" class="logout">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Manage Courses</h1>
+
+        <form method="POST" action="{{ url_for('admin_market_trends') }}">
+            <label for="course_name">Course Name:</label>
+            <input type="text" id="course_name" name="course_name" required>
+
+            <label for="course_link">Course Link:</label>
+            <input type="url" id="course_link" name="course_link" required>
+
+            <button type="submit">Add Course</button>
+        </form>
+
+        <h2>Existing Courses</h2>
+        <ul>
+            {% for course in courses %}
+                <li>{{ course.name }} - <a href="{{ course.link }}" target="_blank">View Course</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

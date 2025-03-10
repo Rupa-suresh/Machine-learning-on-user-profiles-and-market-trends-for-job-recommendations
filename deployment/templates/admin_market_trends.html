@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Courses</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, #4f46e5, #4338ca);
+            color: white;
+            position: fixed;
+            height: 100%;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 10;
+        }
+        
+        .sidebar h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar ul li a {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar ul li a.logout {
+            color: #fca5a5;
+            margin-top: 40px;
+        }
+        
+        .sidebar ul li a.logout:hover {
+            color: #ef4444;
+        }
+        
+        .main-content {
+            margin-left: 290px;
+            padding: 30px;
+            flex-grow: 1;
+        }
+        
+        .main-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .main-content h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+        
+        .flash {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .flash.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .flash.error, .flash.danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .flash.warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .course-form {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+        
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        
+        button[type="submit"] {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button[type="submit"] i {
+            margin-right: 8px;
+        }
+        
+        .course-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .course-list li {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4f46e5;
+            transition: all 0.3s ease;
+        }
+        
+        .course-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-list li a {
+            background-color: #4f46e5;
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .course-list li a:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .course-list li a i {
+            margin-right: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 15px 10px;
+            }
+            
+            .sidebar h2 {
+                font-size: 0;
+                text-align: center;
+            }
+            
+            .sidebar h2::before {
+                content: "\f2f6";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 24px;
+            }
+            
+            .sidebar ul li a {
+                padding: 15px 0;
+                text-align: center;
+            }
+            
+            .sidebar ul li a span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 100px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2><i class="fas fa-user-shield mr-2"></i> Admin Panel</h2>
+        <ul>
+            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt mr-2"></i> <span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('admin_market_trends') }}" class="active"><i class="fas fa-graduation-cap mr-2"></i> <span>Manage Courses</span></a></li>
+            <li><a href="{{ url_for('admin_logout') }}" class="logout"><i class="fas fa-sign-out-alt mr-2"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1><i class="fas fa-graduation-cap mr-2"></i>Manage Courses</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {% if category == 'success' %}
+                            <i class="fas fa-check-circle mr-2"></i>
+                        {% elif category == 'error' or category == 'danger' %}
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle mr-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="course-form">
+            <form method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="course_name"><i class="fas fa-book mr-2"></i>Course Name:</label>
+                        <input type="text" id="course_name" name="course_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course_link"><i class="fas fa-link mr-2"></i>Course Link:</label>
+                        <input type="url" id="course_link" name="course_link" required>
+                    </div>
+                </div>
+                
+                <button type="submit"><i class="fas fa-plus"></i> Add Course</button>
+            </form>
+        </div>
+
+        <h2><i class="fas fa-list-alt mr-2"></i>Existing Courses</h2>
+        <ul class="course-list">
+            {% for course in courses %}
+                <li>
+                    <span><i class="fas fa-graduation-cap mr-2"></i>{{ course[1] }}</span>
+                    <a href="{{ course[2] }}" target="_blank"><i class="fas fa-external-link-alt"></i> View Course</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

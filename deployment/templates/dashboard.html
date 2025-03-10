@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</h2>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}" class="active"><i class="fas fa-briefcase mr-2"></i>Job Recommendations</a></li>
+            <li><a href="{{ url_for('saved_jobs') }}"><i class="fas fa-bookmark mr-2"></i>Saved Jobs</a></li>
+            <li><a href="{{ url_for('market_trends') }}"><i class="fas fa-chart-line mr-2"></i>Market Trends</a></li>
+            <li><a href="{{ url_for('logout') }}" class="logout"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1><i class="fas fa-briefcase mr-2"></i>Job Recommendations</h1>
+    
+        <!-- Flash Message Display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {% if category == 'success' %}<i class="fas fa-check-circle mr-2"></i>{% else %}<i class="fas fa-exclamation-circle mr-2"></i>{% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Job Recommendation Form -->
+        <form class="job-recommendation-form" method="POST">
+            <h2><i class="fas fa-search mr-2"></i>Find Your Dream Job</h2>
+    
+            <div class="form-row">
+        
+                <div class="form-group">
+                    <label for="skills"><i class="fas fa-tools mr-2"></i>Skills (comma-separated):</label>
+                    <input type="text" id="skills" name="skills" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="section"><i class="fas fa-industry mr-2"></i>Industry/Field:</label>
+                    <input type="text" id="section" name="section" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="experience"><i class="fas fa-history mr-2"></i>Years of Experience:</label>
+                    <input type="number" id="experience" name="experience" min="0" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="locations"><i class="fas fa-map-marker-alt mr-2"></i>Preferred Locations:</label>
+                    <input type="text" id="locations" name="locations" placeholder="Enter locations manually">
+                </div>
+        
+                <div class="form-group">
+                    <label for="salary"><i class="fas fa-money-bill-wave mr-2"></i>Expected Salary (per annum):</label>
+                    <input type="number" id="salary" name="salary" min="0" required>
+                </div>
+            </div>
+    
+            <button type="submit">
+                <i class="fas fa-search mr-2"></i>Get Recommendations
+            </button>
+        </form>
+    
+        <!-- Display Recommendations -->
+        {% if recommendations %}
+            <h2 class="reveal-on-scroll"><i class="fas fa-list-alt mr-2"></i>Recommended Jobs</h2>
+            <ul class="job-list">
+                {% for job in recommendations %}
+                    <li class="job-item reveal-on-scroll" style="animation-delay: {{ loop.index0 * 0.1 }}">
+                        <h3><i class="fas fa-building mr-2"></i>{{ job.Company }}</h3>
+                        
+                        <!-- Buttons Wrapper -->
+                        <div class="button-container">
+                            <a href="{{ job.Job_Link }}" target="_blank" class="job-link">
+                                <i class="fas fa-external-link-alt mr-1"></i> View Job
+                            </a>
+                            
+                            <!-- Save Job Form -->
+                            <form action="{{ url_for('save_job') }}" method="POST" class="save-job-form">
+                                <input type="hidden" name="company" value="{{ job.Company }}">
+                                <input type="hidden" name="job_link" value="{{ job.Job_Link }}">
+                                <button type="submit" class="save-button">
+                                    <i class="fas fa-bookmark mr-1"></i> Save Job
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif request.method == 'POST' %}
+            <div class="bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-md mt-6 reveal-on-scroll">
+                <i class="fas fa-exclamation-triangle mr-2"></i> No recommendations found. Try updating your search criteria.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Success popup for saved jobs -->
+    <div id="saveJobPopup" class="popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3><i class="fas fa-check-circle mr-2"></i>Success</h3>
+                <button class="close-popup">&times;</button>
+            </div>
+            <div class="popup-body">
+                <p>Job saved successfully! You can view all your saved jobs in the Saved Jobs section.</p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ url_for('saved_jobs') }}" class="btn" style="display: inline-block;">
+                        <i class="fas fa-bookmark mr-2"></i>View Saved Jobs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
