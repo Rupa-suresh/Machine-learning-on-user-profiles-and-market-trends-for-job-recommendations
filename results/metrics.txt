@@ -1,0 +1,7 @@
+K-means (k=8): Silhouette Score = 0.501
+DBSCAN: 11 clusters, Silhouette Score = 0.423
+Hierarchical (k=8): Silhouette Score = 0.501
+GMM (k=8): Silhouette Score = 0.376
+
+Average Cosine Similarity: 0.960
+Random Baseline Similarity: 0.742
